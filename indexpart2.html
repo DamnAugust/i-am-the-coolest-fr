@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land of Rainbow and Sunshine</title>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #12ff3d;
+            color: #000;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .hearts {
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .options {
+            margin: 20px;
+        }
+
+        .options button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #000;
+        }
+
+        .options button:active {
+            background-color: #ccc;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .final-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb);
+            color: #fff;
+            text-align: center;
+            z-index: 20;
+            animation: background-animation 5s infinite;
+        }
+
+        @keyframes background-animation {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .final-message {
+            font-size: 50px;
+            font-weight: bold;
+            margin-top: 20%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="hearts" class="hearts">
+            <img id="heart-image" src="images/3hearts.png" alt="3 Hearts">
+        </div>
+        <div id="game-area">
+            <div id="question" class="question">I solemnly swear that I will speak the truth.</div>
+            <div id="options" class="options">
+                <button onclick="startGame()">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-over" class="game-over">
+        <img src="gameover.png" alt="Game Over">
+        <div class="question" id="death-message"></div>
+        <button onclick="restartGame()">Try Again</button>
+    </div>
+
+    <div id="final-screen" class="final-screen">
+        <div class="final-message" id="final-message"></div>
+    </div>
+
+    <script>
+        let lives = 3;
+        const heartImage = document.getElementById('heart-image');
+        const gameArea = document.getElementById('game-area');
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const gameOverEl = document.getElementById('game-over');
+        const deathMessageEl = document.getElementById('death-message');
+        const finalScreenEl = document.getElementById('final-screen');
+        const finalMessageEl = document.getElementById('final-message');
+        const body = document.body;
+
+        function updateHearts() {
+            if (lives === 3) {
+                heartImage.src = '3hearts.png';
+            } else if (lives === 2) {
+                heartImage.src = '2hearts.png';
+            } else if (lives === 1) {
+                heartImage.src = '1heart.png';
+            } else {
+                heartImage.style.display = 'none';
+            }
+        }
+
+        function loseLife() {
+            lives--;
+            updateHearts();
+            if (lives === 0) {
+                triggerGameOver();
+            }
+        }
+
+        function triggerGameOver() {
+            const messages = [
+                "The Land believes in second chances... for now.!",
+                "Did a pot of gold hit you on the head? Try again!",
+                "Why do you even lie, Dora?.",
+                "The Land of Rainbow and Sunshine frowns upon deceit!",
+            ];
+            deathMessageEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+            gameOverEl.style.display = 'block';
+            gameArea.style.display = 'none';
+        }
+
+        function restartGame() {
+            lives = 3;
+            updateHearts();
+            gameOverEl.style.display = 'none';
+            gameArea.style.display = 'block';
+            startGame();
+        }
+
+        function askQuestion(question, options) {
+            questionEl.textContent = question;
+            optionsEl.innerHTML = '';
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.onclick = option.action;
+                optionsEl.appendChild(button);
+            });
+        }
+
+        function startGame() {
+            askQuestion("Have you ever seen a rainbow?", [
+                { text: "OMG how did you know? Stalker fr!", action: () => askQuestion("Have you ever experienced sunshine?", [
+                    { text: "Okay, now I am scared.", action: () => askQuestion("Are you a loner at heart?", [
+                        { text: "Always", action: () => askQuestion("Hello, you small weird impish creature, how are you?", [
+                            { text: "Good", action: () => askQuestion("Do you promise to remain slay?", [
+                                { text: "YES", action: askForFactions }
+                            ]) },
+                            { text: "SLAY", action: askForFactions }
+                        ]) },
+                        { text: "Ew no", action: loseLife }
+                    ]) },
+                    { text: "Uh no", action: loseLife }
+                ]) },
+                { text: "Uh no", action: loseLife }
+            ]);
+        }
+
+        function askForFactions() {
+            askQuestion("Who is the greatest, awesomest, and coolest guy alive?", [
+                { text: "Rahul", action: () => {
+                    body.style.backgroundColor = 'black';
+                    askForFinalPhase();
+                } },
+                { text: "Rohith", action: () => {
+                    body.style.backgroundColor = 'white';
+                    askForFinalPhase();
+                } }
+            ]);
+        }
+
+        function askForFinalPhase() {
+            finalScreenEl.style.display = 'block';
+            finalMessageEl.textContent = "Welcome to the Land of Rainbow and Sunshine!";
+        }
+    </script>
+</body>
+</html>
